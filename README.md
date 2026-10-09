@@ -2,6 +2,29 @@
 
 GhostTrack is a publicly available command-line OSINT utility for **approximate public IP geolocation**, **phone-number plan metadata**, and **public username profile links**. This local refresh is based on [HunxByts/GhostTrack](https://github.com/HunxByts/GhostTrack); it is not an official upstream release. The original project does not publish a license.
 
+## New: Web application with isolated administration
+
+The modernized fork also supports two **separate FastAPI web interfaces**:
+
+- **Private admin** on `http://127.0.0.1:8001` — password-protected dashboard with the public-access switch, aggregate usage and private lookups.
+- **Public lookup site** on `http://127.0.0.1:8000` — responsive IP, phone and username tools. Lookups are **disabled by default** until enabled in admin.
+
+To initialize your administrator credentials and start both web services on
+your Docker-enabled machine:
+
+```sh
+python3 scripts/setup_secrets.py
+docker compose build
+docker compose up -d ghosttrack-admin ghosttrack-public
+```
+
+Both ports bind only to localhost by default. Do not expose the admin port to
+the internet. See **[WEB-DEPLOYMENT.md](WEB-DEPLOYMENT.md)** before exposing
+the public site, including HTTPS, firewall, reverse proxy and rate limits.
+
+The original CLI remains available with
+`docker compose --profile cli run --rm ghosttrack`.
+
 ![GhostTrack banner](asset/bn.png)
 
 ## What's improved (October 2026)

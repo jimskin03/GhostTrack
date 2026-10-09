@@ -6,3 +6,8 @@ __pycache__/
 .coverage
 *.egg-info/
 .DS_Store
+# Administrator secrets, never commit or send to browser
+.secrets/
+.env
+.data/
+.local-dev/
