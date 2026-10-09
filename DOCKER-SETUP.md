@@ -1,45 +1,33 @@
 # GhostTrack Docker setup
 
-GhostTrack is an interactive terminal application, not a web server.
-Docker Compose runs it as a non-root user with a read-only filesystem and
-no published ports. It needs outgoing HTTPS access for public lookup APIs.
+See [WEB-DEPLOYMENT.md](WEB-DEPLOYMENT.md) for the web deployment with two
+separate FastAPI applications: localhost-only private admin and a public
+lookup service disabled by default.
 
-## Build and run
+## CLI (unchanged)
 
 ```sh
-cd /home/ubuntu/greg/Projects/GhostTrack
+docker compose --profile cli build ghosttrack
+docker compose --profile cli run --rm ghosttrack
+docker compose --profile cli run --rm ghosttrack ip 8.8.8.8 --json
+```
+
+The original CLI remains an independent container and has no published ports.
+
+## Web
+
+```sh
+python3 scripts/setup_secrets.py
 docker compose build
-docker compose run --rm ghosttrack
+docker compose up -d ghosttrack-admin ghosttrack-public
 ```
 
-Select a menu item (1-4), or enter 0 to quit.
-For one-off scripted lookups:
+- Admin: `http://127.0.0.1:8001` (never publicly expose)
+- Public: `http://127.0.0.1:8000` (initially disabled)
 
-```sh
-docker compose run --rm ghosttrack ip 8.8.8.8 --json
-docker compose run --rm ghosttrack phone +60123456789 --region MY
-docker compose run --rm ghosttrack username octocat
-```
+## Environment limitations
 
-## Docker without Compose
-
-```sh
-docker build -t ghosttrack:local .
-docker run --rm -it --read-only --tmpfs /tmp:rw,noexec,nosuid,size=16m \
-  --cap-drop=ALL --security-opt=no-new-privileges --pids-limit=64 \
-  --memory=256m ghosttrack:local
-```
-
-## Verification note
-
-The connected Linux_VM coding shell may be running in an existing container
-without a Docker binary or mounted daemon socket. In that case Docker builds
-and runs must be performed on the **Docker-enabled Ubuntu host**.
-Run `docker compose config` and `docker compose build` there.
-
-## Scope and accuracy
-
-Phone data is metadata from public numbering plans, not a live device
-location. IP geolocation is approximate, not street-level tracking.
-GitHub and GitLab username status uses public APIs; links to other
-platforms are unverified and should not be treated as found accounts.
+The Linux VM coding connector can run inside a restricted container without
+a Docker executable or access to the host daemon. If so, build/run on the
+Docker-enabled Ubuntu host. Do not mount the Docker socket into untrusted
+services solely to run the app.
