@@ -1,0 +1,20 @@
+services:
+  ghosttrack:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ghosttrack:local
+    stdin_open: true
+    tty: true
+    read_only: true
+    tmpfs:
+      - /tmp:rw,noexec,nosuid,size=16m
+    cap_drop:
+      - ALL
+    security_opt:
+      - no-new-privileges:true
+    pids_limit: 64
+    mem_limit: 256m
+    restart: "no"
+    # Interactive CLI only. No ports are published.
+    # Outbound access is needed for public OSINT lookup endpoints.

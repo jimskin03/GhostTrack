@@ -1,0 +1,11 @@
+.git
+.github
+.venv
+.gitignore
+__pycache__
+*.pyc
+asset
+tests
+README.md
+DOCKER-SETUP.md
+compose.yaml
